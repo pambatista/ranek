@@ -1,19 +1,28 @@
 <template>
   <section class="produto-container">
-    <div v-if="produtos.length > 0" class="produtos">
-      <div v-for="(produto, index) in produtos" :key="index" class="produto">
-        <router-link to="/">
-          <img v-if="produto.fotos" :src="produto.fotos[0]" />
-          <p class="preco">{{ produto.preco }}</p>
-          <h2 class="titulo">{{ produto.nome }}</h2>
-          <p>{{ produto.descricao }}</p>
-        </router-link>
+    <transition mode="out-in">
+      <div
+        v-if="produtos && produtos.length > 0"
+        class="produtos"
+        key="produto"
+      >
+        <div v-for="(produto, index) in produtos" :key="index" class="produto">
+          <router-link :to="`/produto/${produto.id}`">
+            <img v-if="produto.fotos" :src="produto.fotos[0]" />
+            <p class="preco">{{ produto.preco }}</p>
+            <h2 class="titulo">{{ produto.nome }}</h2>
+            <p>{{ produto.descricao }}</p>
+          </router-link>
+        </div>
+        <produtos-paginar :paginacao="paginacao" />
       </div>
-      <produtos-paginar :paginacao="paginacao" />
-    </div>
-    <div v-else-if="produtos.length === 0">
-      <p class="sem-resultados">Busca sem resultados.</p>
-    </div>
+      <div v-else-if="produtos && produtos.length === 0" key="sem-resultado">
+        <p class="sem-resultados">Busca sem resultados.</p>
+      </div>
+      <div v-else key="carregando">
+        <paginaCarregando />
+      </div>
+    </transition>
   </section>
 </template>
 
@@ -43,17 +52,20 @@ export default {
   },
   methods: {
     carregarProdutos(params) {
-      this.$axios
-        .get("/produtos", {
-          params: {
-            _limit: this.paginacao.porPagina,
-            ...params,
-          },
-        })
-        .then((response) => {
-          this.paginacao.total = Number(response.headers["x-total-count"]);
-          this.produtos = response.data;
-        });
+      this.produtos = null;
+      setTimeout(() => {
+        this.$axios
+          .get("/produtos", {
+            params: {
+              _limit: this.paginacao.porPagina,
+              ...params,
+            },
+          })
+          .then((response) => {
+            this.paginacao.total = Number(response.headers["x-total-count"]);
+            this.produtos = response.data;
+          });
+      }, 2000);
     },
   },
   created() {
