@@ -2,10 +2,10 @@ import Vue from "vue";
 import App from "./App.vue";
 import router from "./router";
 import store from "./store";
-import service from "./service";
+import api from "./api";
 import paginaCarregando from "./components/PaginaCarregando.vue";
 
-Vue.prototype.$axios = service;
+Vue.prototype.$axios = api;
 Vue.config.productionTip = false;
 
 Vue.filter("numeroPreco", (valor) => {
