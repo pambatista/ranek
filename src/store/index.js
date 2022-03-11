@@ -20,6 +20,7 @@ export default new Vuex.Store({
       cidade: "",
       estado: "",
     },
+    usuario_produtos: [],
   },
   getters: {},
   mutations: {
